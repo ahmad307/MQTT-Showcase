@@ -12,13 +12,45 @@
     <h1>MQTT Web Client</h1>
     <form method="POST">
         {% csrf_token %}
-        <div class="form-group">
-            <label for="host">Host</label>
-            <input type="text" class="form-control" id="host" name="host" value="broker.mqttdashboard.com">
-            <label for="port">Port</label>
-            <input type="text" class="form-control" id="port" name="port" value="1883">
+        <div class="form-group container">
+            <!-- Basic Info -->
+            <div class="row">
+                <div class="col-xs-2">
+                    <label for="host">Host</label>
+                    <input type="text" class="form-control" id="host" name="host" value="broker.mqttdashboard.com">
+                </div>
+                <div class="col-xs-2">
+                    <label for="port">Port</label>
+                    <input type="text" class="form-control" id="port" name="port" value="1883">
+                </div>
+                <div class="col-xs-2">
+                    <label for="client_id">Client ID</label>
+                    <input type="text" class="form-control" id="client_id" name="client_id">
+                </div>
+            </div>
+            <!-- Submit Button -->
+            <div class="row">
+                <div class="col-xs-2">
+                    <button type="submit" name="submit_btn" class="btn btn-primary btn-md" value="connect">{{ submit_btn_text }}</button>
+                </div>
+            </div>
+
+            <!-- Aditional Info -->
+            <div class="row">
+                <div class="col-xs-2">
+                    <label for="username">Username</label>
+                    <input type="text" class="form-control" name="username" id="username">
+                </div>
+                <div class="col-xs-2">
+                    <label for="password">Password</label>
+                    <input type="text" class="form-control" name="password" id="password">
+                </div>
+                <div class="col-xs-2">
+                    <label for="keep_alive">Keep Alive</label>
+                    <input type="text" class="form-control" name="keep_alive" id="keep_alive" value="60">
+                </div>
+            </div>
         </div>
-        <button type="submit" class="btn-primary btn-md">Connect</button>
         <h3 style="color: green">{{ connection_result }}</h3>
     </form>
 </div>
