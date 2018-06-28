@@ -1,4 +1,5 @@
 import paho.mqtt.client as paho
+import time
 
 class Connection:
     def __init__(self):
@@ -14,10 +15,7 @@ class Connection:
         # Debug message
         print('log!')
 
-    def connect(self,broker="broker.mqttdashboard.com"):
-        self.client.connect(broker, 1883)
-
+    def connect(self,broker,port):
+        self.client.connect(broker, port)
         self.client.loop_start()
         self.client.loop_stop()
-
-        return 'connected'
