@@ -14,6 +14,7 @@
     <h1>MQTT Web Client</h1>
     <form method="POST" id="input_form">
         {% csrf_token %}
+        <h2>Connection</h2>
         <div class="form-group container">
             <!-- Basic Info -->
             <div class="row">
@@ -66,30 +67,48 @@
         // Send POST request if the user wants to connect
         if ($('#submit_btn').text() === 'Connect'){
             var frm = $('#input_form');
-            create_post(frm);
+            post_connect(frm);
         } else {
+            post_disconnect();
             $('#submit_btn').text('Connect');
             $('#connection_result').text('');
         }
     });
 
     // Send POST request to the server with given form's data
-    function create_post(frm) {
+    //  to begin MQTT connection
+    function post_connect(frm) {
         $.ajax({
-            url: '/ajaxpost/',
+            url: '/ajaxconnect/',
             type:'POST',
             data:frm.serialize(),
 
             success: function (json) {
-                console.log('Ajax Success');
+                console.log('Ajax Connection success');
                 var pressed = document.getElementById('submit_btn');
                 $('#submit_btn').text('Disconnect');
                 $('#connection_result').text('Connected');
             },
             error: function (xhr,errmsg,err) {
-                console.log('Ajax Fail');
+                console.log('Ajax Connection Fail');
             }
         });
     };
+
+    // Send POST request to the server to end MQTT connection
+    function post_disconnect() {
+        $.ajax({
+            url: '/ajaxdisconnect/',
+            type: 'POST',
+            data: {csrfmiddlewaretoken:'{{ csrf_token }}'},
+
+            success: function () {
+                console.log('Ajax Disconnection Success');
+            },
+            error: function () {
+                console.log('Ajax Disconnection Fail');
+            }
+        });
+    }
 </script>
 </html>

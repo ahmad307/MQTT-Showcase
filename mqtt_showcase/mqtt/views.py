@@ -2,10 +2,14 @@ from django.shortcuts import render,HttpResponse
 from mqtt.paho_client import Connection
 import json
 
+# Global connection variable
+client = None
+
 def index(request):
     return render(request,'mqtt/index.html')
 
 def post(request):
+    global client
     if request.method == 'POST':
         # Get entered data
         broker = request.POST.get('host')
@@ -24,3 +28,9 @@ def post(request):
 
     return HttpResponse(json.dumps({}),content_type='application/json')
 
+def post_disconnect(request):
+    global client
+    if request.method == 'POST':
+        client.disconnect()
+
+    return HttpResponse(json.dumps({}),content_type='application/json')
