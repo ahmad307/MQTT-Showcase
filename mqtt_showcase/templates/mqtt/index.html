@@ -6,11 +6,13 @@
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- JQuery -->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body>
 <div class="jumbotron">
     <h1>MQTT Web Client</h1>
-    <form method="POST">
+    <form method="POST" id="input_form">
         {% csrf_token %}
         <div class="form-group container">
             <!-- Basic Info -->
@@ -28,10 +30,13 @@
                     <input type="text" class="form-control" id="client_id" name="client_id">
                 </div>
             </div>
-            <!-- Submit Button -->
+            <!-- Connection Buttons -->
             <div class="row">
                 <div class="col-xs-2">
-                    <button type="submit" name="submit_btn" class="btn btn-primary btn-md" value="connect">{{ submit_btn_text }}</button>
+                    <button type="submit" name="submit_btn" id="submit_btn" class="btn btn-primary btn-md" value="connect">Connect</button>
+                </div>
+                <div class="col-xs-2">
+                    <h3 style="color: green" id="connection_result"></h3>
                 </div>
             </div>
 
@@ -51,8 +56,40 @@
                 </div>
             </div>
         </div>
-        <h3 style="color: green">{{ connection_result }}</h3>
     </form>
 </div>
 </body>
+<script type="text/javascript">
+    $('#input_form').on('submit', function (e) {
+        e.preventDefault();
+
+        // Send POST request if the user wants to connect
+        if ($('#submit_btn').text() === 'Connect'){
+            var frm = $('#input_form');
+            create_post(frm);
+        } else {
+            $('#submit_btn').text('Connect');
+            $('#connection_result').text('');
+        }
+    });
+
+    // Send POST request to the server with given form's data
+    function create_post(frm) {
+        $.ajax({
+            url: '/ajaxpost/',
+            type:'POST',
+            data:frm.serialize(),
+
+            success: function (json) {
+                console.log('Ajax Success');
+                var pressed = document.getElementById('submit_btn');
+                $('#submit_btn').text('Disconnect');
+                $('#connection_result').text('Connected');
+            },
+            error: function (xhr,errmsg,err) {
+                console.log('Ajax Fail');
+            }
+        });
+    };
+</script>
 </html>
