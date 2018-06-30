@@ -15,7 +15,7 @@
     <form method="POST" id="connection_form">
         {% csrf_token %}
         <h2>Connection</h2>
-        <input type="hidden" name="hiddenattr" value="connect">
+        <input type="hidden" name="hiddenattr" value="connect"> <!-- Used as a unique attribute -->
         <div class="form-group container">
             <!-- Basic Info -->
             <div class="row">
@@ -60,11 +60,27 @@
         </div>
     </form>
 
+    <!-- Subscibe Section -->
+    <h2>Subscribe</h2>
+    <form method="POST" id="subscribe_form">
+        {% csrf_token %}
+        <input type="hidden" name="hiddenattr" value="subscribe"> <!-- Used as a unique attribute -->
+        <div class="form-group row">
+            <div class="col-xs-2">
+                <label for="subscribe_topic">Topic</label>
+                <input type="text" class="form-control" id="subscribe_topic" name="subscribe_topic">
+            </div>
+            <button class="btn btn-primary btn-md">Subscribe</button>
+        </div>
+    </form>
+
     <!-- Publish Section -->
     <form method="POST" id="publish_form">
         {% csrf_token %}
-        <h2>Publish</h2>
-        <input type="hidden" name="hiddenattr" value="publish">
+        <div class="row">
+            <h2 class="col-xs-1">Publish</h2>
+        </div>
+        <input type="hidden" name="hiddenattr" value="publish"> <!-- Used as a unique attribute -->
         <div class="form-group container">
             <div class="row">
                 <div class="col-xs-2">
@@ -86,8 +102,8 @@
 </body>
 <script type="text/javascript">
     // Prevent page from reloading upon submission of connection form
-    $('#connection_form').on('submit', function (e) {
-        e.preventDefault();
+    $('#connection_form').on('submit', function (event) {
+        event.preventDefault();
 
         // Send POST request if the user wants to connect
         if ($('#connect_btn').text() === 'Connect'){
@@ -100,8 +116,8 @@
         }
     });
 
-    $('#publish_form').on('submit', function (e) {
-        e.preventDefault();
+    $('#publish_form').on('submit', function (event) {
+        event.preventDefault();
 
         if ($('#message').val().length !== 0 && $('#topic').val().length !== 0){
             var frm = $('#publish_form');
@@ -111,6 +127,12 @@
         }
 
     });
+
+    $('#subscribe_form').on('submit', function (event) {
+        event.preventDefault();
+        var frm = $('#subscribe_form');
+        post_connect(frm);
+    })
 
     // Send POST request to the server with given form's data
     //  to begin/publish MQTT connection/topic
