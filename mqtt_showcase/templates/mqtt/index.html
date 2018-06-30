@@ -14,9 +14,9 @@
     <h1>MQTT Web Client</h1>
     <form method="POST" id="connection_form">
         {% csrf_token %}
-        <h2>Connection</h2>
         <input type="hidden" name="hiddenattr" value="connect"> <!-- Used as a unique attribute -->
         <div class="form-group container">
+            <h2>Connection</h2>
             <!-- Basic Info -->
             <div class="row">
                 <div class="col-xs-2">
@@ -32,6 +32,7 @@
                     <input type="text" class="form-control" id="client_id" name="client_id">
                 </div>
             </div>
+            <br>
             <!-- Connection Button -->
             <div class="row">
                 <div class="col-xs-2">
@@ -41,6 +42,7 @@
                     <h3 style="color: green" id="connection_result"></h3>
                 </div>
             </div>
+            <br>
 
             <!-- Aditional Info -->
             <div class="row">
@@ -61,43 +63,54 @@
     </form>
 
     <!-- Subscibe Section -->
-    <h2>Subscribe</h2>
     <form method="POST" id="subscribe_form">
         {% csrf_token %}
         <input type="hidden" name="hiddenattr" value="subscribe"> <!-- Used as a unique attribute -->
-        <div class="form-group row">
-            <div class="col-xs-2">
-                <label for="subscribe_topic">Topic</label>
-                <input type="text" class="form-control" id="subscribe_topic" name="subscribe_topic">
+        <div class="form-group container">
+            <h2>Subscribe</h2>
+            <div class="row">
+                <div class="col-xs-2">
+                    <label for="subscribe_topic">Topic</label>
+                    <input type="text" class="form-control" id="subscribe_topic" name="subscribe_topic">
+                </div>
+                <button class="btn btn-primary btn-md">Subscribe</button>
             </div>
-            <button class="btn btn-primary btn-md">Subscribe</button>
         </div>
     </form>
 
     <!-- Publish Section -->
     <form method="POST" id="publish_form">
         {% csrf_token %}
-        <div class="row">
-            <h2 class="col-xs-1">Publish</h2>
-        </div>
-        <input type="hidden" name="hiddenattr" value="publish"> <!-- Used as a unique attribute -->
         <div class="form-group container">
             <div class="row">
-                <div class="col-xs-2">
-                    <label for="topic">Topic</label>
-                    <input type="text" class="form-control" id="topic" name="topic">
-                </div>
-                <div class="col-xs-2">
-                    <label for="message">Message</label>
-                    <input type="text" class="form-control" id="message" name="message">
-                </div>
-                <br>
-                <div class="col-xs-2">
-                    <button type="submit" id="publish_btn" class="btn btn-primary btn-md">Publish</button>
+                <h2 class="col-xs-1">Publish</h2>
+            </div>
+            <input type="hidden" name="hiddenattr" value="publish"> <!-- Used as a unique attribute -->
+            <div class="form-group container">
+                <div class="row">
+                    <div class="col-xs-2">
+                        <label for="topic">Topic</label>
+                        <input type="text" class="form-control" id="topic" name="topic">
+                    </div>
+                    <div class="col-xs-2">
+                        <label for="message">Message</label>
+                        <input type="text" class="form-control" id="message" name="message">
+                    </div>
+                    <br>
+                    <div class="col-xs-2">
+                        <button type="submit" id="publish_btn" class="btn btn-primary btn-md">Publish</button>
+                    </div>
                 </div>
             </div>
         </div>
     </form>
+
+    <!-- Messages Section -->
+    <h2>Messages</h2>
+    <div id="messages">
+        <!-- Empty list to be filled with messages -->
+        <ul id="messages_list"></ul>
+    </div>
 </div>
 </body>
 <script type="text/javascript">
@@ -122,6 +135,7 @@
         if ($('#message').val().length !== 0 && $('#topic').val().length !== 0){
             var frm = $('#publish_form');
             post_connect(frm);
+            get_messages();
         } else {
             window.alert('Enter valid Topic and Message.')
         }
@@ -132,6 +146,7 @@
         event.preventDefault();
         var frm = $('#subscribe_form');
         post_connect(frm);
+        window.alert('Topic Subscribed');
     })
 
     // Send POST request to the server with given form's data
@@ -143,11 +158,11 @@
             data:frm.serialize(),
 
             success: function (json) {
+                // Prompt the user if he's trying to publish without connection
                 if (json['message'] === 'Not Connected'){
-                    // Prompt the user if he's trying to publish without connection
                     window.alert('Please Connect First');
+                // Change connect button value if connection was established
                 } else if(document.activeElement.getAttribute('value') === 'connect') {
-                    // Change connect button value if connection was established
                     console.log('Ajax Connection success');
                     var pressed = document.getElementById('connect_btn');
                     $('#connect_btn').text('Disconnect');
@@ -173,6 +188,18 @@
             error: function () {
                 console.log('Ajax Disconnection Fail');
             }
+        });
+    }
+
+    function get_messages() {
+        $.get("/get/", function (data, status) {
+            var size = data['messages'].length;
+            var item = data['messages'][size - 1];
+            $('#messages_list').prepend("<li>" + item + "</li>");
+            /*for (var i=0;i<data['messages'].length;i++){
+                var item = data['messages'][i];
+                $('#messages_list').prepend("<li>" + item + "</li>");
+            }*/
         });
     }
 </script>

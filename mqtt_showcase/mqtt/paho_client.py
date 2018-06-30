@@ -15,6 +15,7 @@ class Connection:
         self.client.on_publish = self.on_publish
         self.client.on_message = self.on_message
         self.client_id = self.client._client_id
+        self.messages = []
 
         if username!=None and password!=None:
             self.client.username_pw_set(username,password)
@@ -35,7 +36,9 @@ class Connection:
 
     def on_message(self, client, userdata, msg):
         """Called when a message is published by a subscribed topic."""
-        print('message:', str(msg.payload).replace("b'",""))
+        message = str(msg.payload).replace("b'","")
+        print('message:', message)
+        self.messages.append(message)
 
     def connect(self, broker,port, keepalive):
         """Establishes a connection with the given host.

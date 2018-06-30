@@ -7,4 +7,5 @@ urlpatterns = [
     url(r'^$',include('mqtt.urls')),
     url(r'^ajaxconnect', views.post),
     url(r'^ajaxdisconnect',views.post_disconnect),
+    url(r'^get',views.get_messages),
 ]

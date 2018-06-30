@@ -1,6 +1,7 @@
 from django.shortcuts import render,HttpResponse
 from mqtt.paho_client import Connection
 import json
+import time
 
 # Global connection variable
 client = None
@@ -60,3 +61,10 @@ def post_disconnect(request):
         client.disconnect()
 
     return HttpResponse(json.dumps({}),content_type='application/json')
+
+def get_messages(request):
+    global client
+    messages = client.messages
+    time.sleep(1)
+    print("get_messages",messages)
+    return HttpResponse(json.dumps({'messages':messages}),content_type='appliaction/json')
