@@ -10,6 +10,7 @@ class Connection:
         self.client.on_connect = self.on_connect
         self.client.on_disconnect = self.on_disconnect
         self.client.on_log = self.on_log
+        self.client.on_publish = self.on_publish
         self.client_id = self.client._client_id
 
         if username!=None and password!=None:
@@ -26,6 +27,9 @@ class Connection:
         # Debug message
         print('log!')
 
+    def on_publish(self, client, userdata, mid):
+        print('Published!')
+
     def connect(self,broker,port,keepalive):
         """Establishes a connection with the given host"""
         self.client.connect(host=broker, port=port,keepalive=keepalive)
@@ -34,3 +38,6 @@ class Connection:
     def disconnect(self):
         self.client.loop_stop()
         self.client.disconnect()
+
+    def publish(self, topic, message):
+        self.client.publish(topic, message, qos=1)

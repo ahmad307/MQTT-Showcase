@@ -12,9 +12,10 @@
 <body>
 <div class="jumbotron">
     <h1>MQTT Web Client</h1>
-    <form method="POST" id="input_form">
+    <form method="POST" id="connection_form">
         {% csrf_token %}
         <h2>Connection</h2>
+        <input type="hidden" name="hiddenattr" value="connect">
         <div class="form-group container">
             <!-- Basic Info -->
             <div class="row">
@@ -31,10 +32,10 @@
                     <input type="text" class="form-control" id="client_id" name="client_id">
                 </div>
             </div>
-            <!-- Connection Buttons -->
+            <!-- Connection Button -->
             <div class="row">
                 <div class="col-xs-2">
-                    <button type="submit" name="submit_btn" id="submit_btn" class="btn btn-primary btn-md" value="connect">Connect</button>
+                    <button type="submit" name="connect_btn" id="connect_btn" class="btn btn-primary btn-md" value="connect">Connect</button>
                 </div>
                 <div class="col-xs-2">
                     <h3 style="color: green" id="connection_result"></h3>
@@ -49,7 +50,7 @@
                 </div>
                 <div class="col-xs-2">
                     <label for="password">Password</label>
-                    <input type="text" class="form-control" name="password" id="password">
+                    <input type="password" class="form-control" name="password" id="password">
                 </div>
                 <div class="col-xs-2">
                     <label for="keep_alive">Keep Alive</label>
@@ -58,25 +59,61 @@
             </div>
         </div>
     </form>
+
+    <!-- Publish Section -->
+    <form method="POST" id="publish_form">
+        {% csrf_token %}
+        <h2>Publish</h2>
+        <input type="hidden" name="hiddenattr" value="publish">
+        <div class="form-group container">
+            <div class="row">
+                <div class="col-xs-2">
+                    <label for="topic">Topic</label>
+                    <input type="text" class="form-control" id="topic" name="topic">
+                </div>
+                <div class="col-xs-2">
+                    <label for="message">Message</label>
+                    <input type="text" class="form-control" id="message" name="message">
+                </div>
+                <br>
+                <div class="col-xs-2">
+                    <button type="submit" id="publish_btn" class="btn btn-primary btn-md">Publish</button>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
 </body>
 <script type="text/javascript">
-    $('#input_form').on('submit', function (e) {
+    // Prevent page from reloading upon submission of connection form
+    $('#connection_form').on('submit', function (e) {
         e.preventDefault();
 
         // Send POST request if the user wants to connect
-        if ($('#submit_btn').text() === 'Connect'){
-            var frm = $('#input_form');
+        if ($('#connect_btn').text() === 'Connect'){
+            var frm = $('#connection_form');
             post_connect(frm);
         } else {
             post_disconnect();
-            $('#submit_btn').text('Connect');
+            $('#connect_btn').text('Connect');
             $('#connection_result').text('');
         }
     });
 
+    $('#publish_form').on('submit', function (e) {
+        e.preventDefault();
+
+        if ($('#message').val().length !== 0 && $('#topic').val().length !== 0){
+            var frm = $('#publish_form');
+            post_connect(frm);
+        } else {
+            window.alert('Enter valid Topic and Message.')
+        }
+
+    });
+
     // Send POST request to the server with given form's data
-    //  to begin MQTT connection
+    //  to begin/publish MQTT connection/topic
     function post_connect(frm) {
         $.ajax({
             url: '/ajaxconnect/',
@@ -84,16 +121,22 @@
             data:frm.serialize(),
 
             success: function (json) {
-                console.log('Ajax Connection success');
-                var pressed = document.getElementById('submit_btn');
-                $('#submit_btn').text('Disconnect');
-                $('#connection_result').text('Connected');
+                if (json['message'] === 'Not Connected'){
+                    // Prompt the user if he's trying to publish without connection
+                    window.alert('Please Connect First');
+                } else if(document.activeElement.getAttribute('value') === 'connect') {
+                    // Change connect button value if connection was established
+                    console.log('Ajax Connection success');
+                    var pressed = document.getElementById('connect_btn');
+                    $('#connect_btn').text('Disconnect');
+                    $('#connection_result').text('Connected');
+                }
             },
             error: function (xhr,errmsg,err) {
                 console.log('Ajax Connection Fail');
             }
         });
-    };
+    }
 
     // Send POST request to the server to end MQTT connection
     function post_disconnect() {
