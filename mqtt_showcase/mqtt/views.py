@@ -27,7 +27,7 @@ def post(request):
             try:
                 client.publish(topic,message)
             except(AttributeError):
-                return HttpResponse(json.dumps({'message':'Not Connected'}),content_type='applicaiton/json')
+                return HttpResponse(json.dumps({'message':'Not Connected'}),content_type='application/json')
 
         elif form_name == 'subscribe':
             topic = request.POST.get('subscribe_topic')
@@ -66,5 +66,4 @@ def get_messages(request):
     global client
     messages = client.messages
     time.sleep(1)
-    print("get_messages",messages)
     return HttpResponse(json.dumps({'messages':messages}),content_type='appliaction/json')
